@@ -2,6 +2,7 @@ include <../openscad-openbuilds/linear_rails/vslot.scad>
 include <../openscad-openbuilds/plates/vslot_gantry_plate.scad>
 include <../openscad-openbuilds/wheels/vwheel.scad>
 include <../openscad-openbuilds/shims_and_spacers/spacer.scad>
+include <../openscad-openbuilds/plates/motor_mount_plate.scad>
 module CncBase(Width, Length) {
   translate([10,0,20])
     rotate([0,90,90])
@@ -15,6 +16,22 @@ module CncBase(Width, Length) {
   translate([0,510,20])
     rotate([0,90,0])
       vslot20x40(Length);
+}
+module CncMotors(Length, Width, Height){
+  translate([0, Width, 0])
+    rotate([90,0,270])
+      motor_mount_plate_nema17();
+    translate([500, Width, 0])
+    rotate([90,0,270])
+      motor_mount_plate_nema17();
+}
+module CncIdlers(Length, Width, Height) {
+  translate([0, 40, 0])
+    rotate([90,0,270])
+  idler_pulley_plate();
+    translate([500, 40, 0])
+    rotate([90,0,270])
+  idler_pulley_plate();
 }
 module CncWheel(X, Y) {
     translate([X,Y,-11])
@@ -68,5 +85,7 @@ module Cnc() {
   Height = 250;
   CncBase(Width, Length);
   CncGantry(Width, Length, Height);
+  CncMotors(Width, Length, Height);
+  CncIdlers(Width, Length, Height);
 }
 Cnc();
