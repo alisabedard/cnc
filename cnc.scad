@@ -16,39 +16,50 @@ module CncBase(Width, Length) {
     rotate([0,90,0])
       vslot20x40(Length);
 }
+module CncWheel(X, Y) {
+    translate([X,Y,-11])
+    vwheel();
+  translate([X,Y,-6])
+    spacer();
+}
 module CncVPlate() {
   20mm_v_plate();
-  translate([-20,-20,-12])
-    vwheel();
-  translate([-20,-20,-6])
-    spacer();
-  translate([-20,20,-12])
-    vwheel();
-  translate([-20,20,-6])
-    spacer();
-  translate([20,-20,-12])
-    vwheel();
-  translate([20,-20,-6])
-    spacer();
-  translate([20,20,-12])
-    vwheel();
-  translate([20,20,-6])
-    spacer();
-  
+  CncWheel(-20,-20);
+  CncWheel(-20,20);
+  CncWheel(20,-20);
+  CncWheel(20,20);
+}
+module universal_v_plate() {
+  universel_v_plate();
+}
+module CncGantryPlate(Width, Length, Height) {
+  universal_v_plate();
+  CncWheel(-30,30);
+  CncWheel(-30,-30);
+  CncWheel(30,30);
+  CncWheel(30,-30);
+}
+module CncZ(Width, Length, Height) {
+  translate([Width/2,Length/2-40, Height+25])
+  rotate([0,90,270])
+  CncGantryPlate(Width, Length, Height);
+  translate([Width/2,Length/2-50,Height/2])
+  vslot20x60(Height);
 }
 module CncGantry(Width, Length, Height) {
+  CncZ(Width, Length, Height);
   translate([0,Width/2-30,Height+24])
     rotate([0,90,0])
       vslot20x40(Width);
-  translate([10,Width/2,45])
+  translate([10,Width/2,44])
     rotate([0,0,90])
       vslot20x40(Height);
-  translate([490,Width/2,45])
+  translate([490,Width/2,44])
     rotate([0,0,90])
       vslot20x40(Height);
-  translate([10,Width/2,43])
+  translate([10,Width/2,42])
     CncVPlate();
-  translate([490,Width/2,43])
+  translate([490,Width/2,42])
     CncVPlate();
 }
 module Cnc() {
