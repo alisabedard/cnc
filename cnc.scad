@@ -27,14 +27,15 @@ module CncMotors(Length, Width, Height){
   translate([0, Width, 0])
     rotate([90,0,270])
       motor_mount_plate_nema17();
-    translate([503, Width, 0])
+    translate([Width+3, Width, 0])
     rotate([90,0,270])
       motor_mount_plate_nema17();
   translate([40,Width/2-40,Height+44])
     rotate([0,0,90])
       motor_mount_plate_nema17();
-  CncStepper(0,480,60.5,0,90,180);
-  CncStepper(500,480,60.5,0,90,0);
+  CncStepper(0,Length-20,60.5,0,90,180);
+  CncStepper(Width,Length-20,60.5,0,90,0);
+  CncStepper(-20,Width/2-20,Height+40,0,0,0);
 }
 module CncIdlers(Length, Width, Height) {
   translate([0, 40, 0])
