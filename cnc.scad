@@ -3,6 +3,12 @@ include <openscad-openbuilds/plates/vslot_gantry_plate.scad>
 include <openscad-openbuilds/wheels/vwheel.scad>
 include <openscad-openbuilds/shims_and_spacers/spacer.scad>
 include <openscad-openbuilds/plates/motor_mount_plate.scad>
+include <MCAD/motors.scad>
+module CncStepper(TX, TY, TZ,
+  RX, RY, RZ) {
+  translate([TX,TY,TZ])rotate([RX,RY,RZ])
+    stepper_motor_mount(17);
+}
 module CncBase(Width, Length) {
   translate([10,0,20])
     rotate([0,90,90])
@@ -27,6 +33,12 @@ module CncMotors(Length, Width, Height){
   translate([40,Width/2-40,Height+44])
     rotate([0,0,90])
       motor_mount_plate_nema17();
+  CncStepper(-3,480,60.5,0,90,0);
+    translate([40,Width/2-40,Height+44])
+    rotate([0,0,90])
+      motor_mount_plate_nema17();
+  CncStepper(-3,480,60.5,0,90,0);
+  CncStepper(500,480,60.5,0,90,180);
 }
 module CncIdlers(Length, Width, Height) {
   translate([0, 40, 0])
