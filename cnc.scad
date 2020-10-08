@@ -24,13 +24,19 @@ module CncMotors(Length, Width, Height){
     translate([500, Width, 0])
     rotate([90,0,270])
       motor_mount_plate_nema17();
+  translate([40,Width/2-40,Height+44])
+    rotate([0,0,90])
+      motor_mount_plate_nema17();
 }
 module CncIdlers(Length, Width, Height) {
   translate([0, 40, 0])
     rotate([90,0,270])
   idler_pulley_plate();
-    translate([500, 40, 0])
+  translate([500, 40, 0])
     rotate([90,0,270])
+  idler_pulley_plate();
+  translate([460,Width/2, Height+44])
+    rotate([0,0,270])
   idler_pulley_plate();
 }
 module CncWheel(X, Y) {
