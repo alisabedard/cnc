@@ -1,8 +1,8 @@
-include <../openscad-openbuilds/linear_rails/vslot.scad>
-include <../openscad-openbuilds/plates/vslot_gantry_plate.scad>
-include <../openscad-openbuilds/wheels/vwheel.scad>
-include <../openscad-openbuilds/shims_and_spacers/spacer.scad>
-include <../openscad-openbuilds/plates/motor_mount_plate.scad>
+include <openscad-openbuilds/linear_rails/vslot.scad>
+include <openscad-openbuilds/plates/vslot_gantry_plate.scad>
+include <openscad-openbuilds/wheels/vwheel.scad>
+include <openscad-openbuilds/shims_and_spacers/spacer.scad>
+include <openscad-openbuilds/plates/motor_mount_plate.scad>
 module CncBase(Width, Length) {
   translate([10,0,20])
     rotate([0,90,90])
