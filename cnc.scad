@@ -2,6 +2,7 @@ include <openscad-openbuilds/linear_rails/vslot.scad>
 include <openscad-openbuilds/plates/vslot_gantry_plate.scad>
 include <openscad-openbuilds/wheels/vwheel.scad>
 include <openscad-openbuilds/shims_and_spacers/spacer.scad>
+include <openscad-openbuilds/shims_and_spacers/shim.scad>
 include <openscad-openbuilds/plates/motor_mount_plate.scad>
 include <MCAD/motors.scad>
 IsDetailed=true;
@@ -63,8 +64,10 @@ module CncIdlers(Length, Width, Height) {
   idler_pulley_plate();
 }
 module CncWheel(X, Y) {
-    translate([X,Y,-11])
+  translate([X,Y,-12])
     vwheel();
+  translate([X,Y,-7])
+    precision_shim();
   translate([X,Y,-6])
     spacer();
 }
@@ -78,7 +81,7 @@ module CncVPlate() {
 module universal_v_plate() {
   universel_v_plate();
 }
-module CncGantryPlate(Width, Length, Height) {
+module CncGantryPlate() {
   universal_v_plate();
   CncWheel(-30,30);
   CncWheel(-30,-30);
@@ -87,10 +90,9 @@ module CncGantryPlate(Width, Length, Height) {
 }
 module CncZPlate(Width,
   Length, Height) {
-      translate([Width/2,Length/2-40, Height+25])
+  translate([Width/2,Length/2-42, Height+25])
   rotate([0,90,270])
-  CncGantryPlate(Width, 
-    Length, Height);
+  CncGantryPlate();
 }
 module SainSmart100() {
   /* This is baed on SainSmart 
@@ -180,7 +182,7 @@ module SainSmart100() {
             CarriageHeight]);
     }
 }
-SainSmart100();
+//SainSmart100();
 module Spindle() {
   SpindleHeight=100;
     color("#666") 
@@ -199,7 +201,19 @@ module Spindle() {
   
 }
 module CncZ(Width, Length, Height) {
-
+  CncZPlate(Width,Length,Height);
+  OffsetX=30;
+  OffsetY=75;
+  OffsetZ=70;
+  translate([Width/2-OffsetX,
+    Length/2-OffsetY,Height-OffsetZ])
+    SainSmart100();
+  SpindleX=Width/2;
+  SpindleY=Length/2-OffsetY-60;
+  SpindleZ=Height-40;
+  translate([SpindleX,SpindleY,
+    SpindleZ])
+    Spindle();
   
 
 //  Offset=60;
