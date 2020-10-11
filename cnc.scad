@@ -25,18 +25,19 @@ module CncStepper(TX, TY, TZ,
     stepper_motor_mount(17);
 }
 module CncBase(Width, Length) {
+  InnerWidth=Width-40;
   translate([10,0,20])
     rotate([0,90,90])
-      Extrusion(20,40,Width);
+      Extrusion(20,40,Length);
   translate([Width-10,0,20])
     rotate([0,90,90])
-      Extrusion(20,40,Width);
-  translate([0,-10,20])
-    rotate([0,90,0])
       Extrusion(20,40,Length);
-  translate([0,Length+10,20])
+  translate([20,10,20])
     rotate([0,90,0])
-      Extrusion(20,40,Length);
+      Extrusion(20,40,InnerWidth);
+  translate([20,Length-10,20])
+    rotate([0,90,0])
+      Extrusion(20,40,InnerWidth);
 }
 module CncMotors(Length, Width, Height){
   translate([0, Width, 0])
@@ -220,6 +221,7 @@ module CncX(Width, Length, Height) {
   translate([0,Length/2-30,Height+24])
     rotate([0,90,0])
       Extrusion(20,40,Width);
+      /*
   // x idler
   translate([Width-40,Length/2,
     Height+44])
@@ -231,6 +233,7 @@ module CncX(Width, Length, Height) {
   translate([40,Width/2-40,Height+44])
     rotate([0,0,90])
       motor_mount_plate_nema17();
+      */
 
 }
 module CncTable(Width, Length, Height) {
@@ -253,7 +256,7 @@ module CncY(Width, Length, Height) {
     CncVPlate();
   translate([2*Width/3,Length/2, 62])
     CncVPlate();
-  CncTable(Width, Length, Height);
+//  CncTable(Width, Length, Height);
 }
 module Cnc() {
   Width = 250;
