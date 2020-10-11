@@ -82,11 +82,6 @@ module CncGantryPlate() {
   CncWheel(30,30);
   CncWheel(30,-30);
 }
-module CncZPlate(Width, Length, Height) {
-  translate([Width/2,Length/2-44, Height+25])
-  rotate([0,90,270])
-  CncGantryPlate();
-}
 module SainSmart100() {
   /* This is baed on SainSmart 
   100mm linear actuator with ball
@@ -194,19 +189,30 @@ module Spindle() {
       cylinder(d=EndMillDiameter,
         h=ColletHeight*2); 
 }
+module CncZPlate(X, Y, Z) {
+  translate([X,Y,Z])
+    rotate([0,90,270])
+      CncGantryPlate();
+}
 module CncZ(Width, Length, Height) {
-  OffsetX=30;
-  OffsetY=75;
-  OffsetZ=70;
-  translate([Width/2-OffsetX,
-    Length/2-OffsetY,Height-OffsetZ])
-    SainSmart100();
-  SpindleX=Width/2;
-  SpindleY=Length/2-OffsetY-56;
-  SpindleZ=Height-40;
-  translate([SpindleX,SpindleY, SpindleZ])
-    Spindle();
-  CncZPlate(Width,Length,Height);
+    GantryY=Length/4*3;
+    X=Width/2;
+    Y=GantryY;
+    Z=Height;
+    AxisX=X-30;
+    AxisY=Y-20;
+    AxisZ=Z-50;
+    translate([AxisX,AxisY,AxisZ])
+      SainSmart100();
+    SpindleX=AxisX+30;
+    SpindleY=AxisY-56;
+    SpindleZ=AxisZ+20;
+    translate([SpindleX,SpindleY,SpindleZ])
+      Spindle();
+    PlateX=X;
+    PlateY=Y+12;
+    PlateZ=Z+25;
+    CncZPlate(PlateX,PlateY,PlateZ);
 }
 module CncX(Width, Length, Height) {
   // gantry towers
@@ -266,7 +272,7 @@ module CncY(Width, Length, Height) {
 module Cnc() {
   Width = 250;
   Length = 250;
-  Height = 250;
+  Height = 200;
   CncBase(Width, Length);
   CncX(Width, Length, Height);
   CncY(Width, Length, Height);
