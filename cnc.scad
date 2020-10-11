@@ -4,6 +4,7 @@ include <openscad-openbuilds/wheels/vwheel.scad>
 include <openscad-openbuilds/shims_and_spacers/spacer.scad>
 include <openscad-openbuilds/shims_and_spacers/shim.scad>
 include <openscad-openbuilds/plates/motor_mount_plate.scad>
+include <openscad-openbuilds/plates/build_plate.scad>
 include <MCAD/motors.scad>
 IsDetailed=true;
 // Render error tolerance.
@@ -44,12 +45,8 @@ module CncMotors(Length, Width, Height){
     translate([Width+3, Width, 0])
     rotate([90,0,270])
       motor_mount_plate_nema17();
-  translate([40,Width/2-40,Height+44])
-    rotate([0,0,90])
-      motor_mount_plate_nema17();
   CncStepper(0,Length-20,60.5,0,90,180);
   CncStepper(Width,Length-20,60.5,0,90,0);
-  CncStepper(-20,Width/2-20,Height+40,0,0,0);
 }
 module CncIdlers(Length, Width, Height) {
   translate([0, 40, 0])
@@ -57,10 +54,6 @@ module CncIdlers(Length, Width, Height) {
   idler_pulley_plate();
   translate([Width+3, 40, 0])
     rotate([90,0,270])
-  idler_pulley_plate();
-  translate([Width-40,Length/2,
-    Height+44])
-    rotate([0,0,270])
   idler_pulley_plate();
 }
 module CncWheel(X, Y) {
@@ -117,19 +110,19 @@ module SainSmart100() {
   PlateY=ExtrusionWidth-PlateLength;
   // bottom plate
   translate([0,PlateY,0])
-  color("#333")
+  color("Black")
     cube([PlateWidth,PlateLength,
       Plate]);
   // extrusion
   translate([0,0,Plate])
-    color("#999")
+    color("Silver")
       cube([ExtrusionLength,
         ExtrusionWidth,
         ExtrusionHeight]);
   // top plate
   translate([0,PlateY,Plate+
     ExtrusionHeight])
-    color("#333")
+    color("Black")
       cube([PlateWidth,PlateLength,
         Plate]);
   // motor
@@ -140,13 +133,13 @@ module SainSmart100() {
   // screw  
   translate([PlateWidth/2,
     -PlateLength/4,Plate])
-    color("#aaa")
+    color("Silver")
       cylinder(d=Diameter,
         h=ScrewLength);
   // coupler
   translate([PlateWidth/2,
     -PlateLength/4,Plate+ScrewLength])
-    color("#66d")
+    color("Blue")
       cylinder(d=Diameter*2,
         h=CouplerLength);
   // carriage
@@ -155,7 +148,7 @@ module SainSmart100() {
     ExtrusionLength)/2,-CarriageLength,
     Plate+ScrewLength/2-
     CarriageHeight/2]){
-      color("#999")
+      color("Silver")
         difference(){
           Slot=CarriageHeight/10;
           cube([CarriageWidth,
@@ -171,12 +164,12 @@ module SainSmart100() {
               Slot]);
         }
       translate([-1,0,0])
-        color("#222")
+        color("Black")
           cube([1,
             CarriageLength,
             CarriageHeight]);
       translate([CarriageWidth,0,0])
-        color("#222")
+        color("Black")
           cube([1,
             CarriageLength,
             CarriageHeight]);
@@ -185,20 +178,24 @@ module SainSmart100() {
 //SainSmart100();
 module Spindle() {
   SpindleHeight=100;
-    color("#666") 
+    color("Gray") 
       cylinder(d=52,
         h=SpindleHeight);
   ColletHeight=20;
   translate([0,0,-ColletHeight])
-    color("#222") 
+    color("Black") 
       cylinder(d=12,h=ColletHeight);
   EndMillDiameter=3;
   EndMillHeight=ColletHeight*2;
   translate([0,0,-EndMillHeight])
-    color("#336") 
+    color("Navy") 
       cylinder(d=EndMillDiameter,
         h=ColletHeight*2); 
-  
+    translate([Width-40,Length/2,
+    Height+44])
+    rotate([0,0,270])
+  idler_pulley_plate();
+
 }
 module CncZ(Width, Length, Height) {
   CncZPlate(Width,Length,Height);
@@ -209,75 +206,50 @@ module CncZ(Width, Length, Height) {
     Length/2-OffsetY,Height-OffsetZ])
     SainSmart100();
   SpindleX=Width/2;
-  SpindleY=Length/2-OffsetY-60;
+  SpindleY=Length/2-OffsetY-56;
   SpindleZ=Height-40;
   translate([SpindleX,SpindleY,
     SpindleZ])
     Spindle();
-  
-
-//  Offset=60;
-//  CncZPlate(Width,Length,Height);
-//  translate([0,0,-40]){
-//    translate([Width/2,
-//      Length/2-50,Height])
-//      Extrusion(20,60,Height/2);
-//    translate([Width/2-30,
-//      Length/2-80,Height+Height/2])
-//      color("#333")
-//        cube([60,40,PlateThick]);
-//    translate([Width/2-30,
-//      Length/2-80,Height-PlateThick])
-//      color("#333")
-//        cube([60,40,PlateThick]);
-//    translate([Width/2,Length/2-70,
-//      Height]) color("#666") 
-//      cylinder(d=12,
-//        h=Height/2);
-//    CncStepper(Width/2,
-//      Length/2-70,
-//      Height+Height/2+PlateThick,
-//      180,0,0);
-//    CarriageZ=Height+Height/4;
-//    CarriageWidth=60;
-//    CarriageLength=40;
-//    CarriageHeight=40;
-//    translate([Width/2-30,
-//      Length/2-CarriageLength-Offset,
-//      CarriageZ])
-//      color("#999")
-//        cube([CarriageWidth,
-//          CarriageLength,
-//          CarriageHeight]);
-//     
-//  }
 }
-module CncGantry(Width, Length, Height) {
-  
-  CncZ(Width, Length, Height);
-  translate([0,Length/2-30,Height+24])
-    rotate([0,90,0])
-      Extrusion(20,40,Width);
+module CncX(Width, Length, Height) {
+  // gantry towers
   translate([10,Length/2,40])
     rotate([0,0,90])
       Extrusion(20,40,Height);
   translate([Width-10,Length/2,40])
     rotate([0,0,90])
       Extrusion(20,40,Height);
-//  translate([10,Width/2,42])
-//    CncVPlate();
-//  translate([Width-10,Length/2,42])
-//    CncVPlate();
+  // x rail
+  translate([0,Length/2-30,Height+24])
+    rotate([0,90,0])
+      Extrusion(20,40,Width);
+  // x idler
+  translate([Width-40,Length/2,
+    Height+44])
+    rotate([0,0,270])
+      idler_pulley_plate();
+  // x motor
+  CncStepper(-20,Width/2-20,Height+40,0,0,0);
+  // x motor plate
+  translate([40,Width/2-40,Height+44])
+    rotate([0,0,90])
+      motor_mount_plate_nema17();
+
 }
 module CncTable(Width, Length, Height) {
+  build_plate();
+}
+module CncY(Width, Length, Height) {
+  CncTable(Width, Length, Height);
 }
 module Cnc() {
   Width = 250;
   Length = 250;
   Height = 250;
   CncBase(Width, Length);
-  CncGantry(Width, Length, Height);
-  CncMotors(Width, Length, Height);
-  CncIdlers(Width, Length, Height);
+  CncX(Width, Length, Height);
+  CncY(Width, Length, Height);
+  CncZ(Width, Length, Height);
 }
 Cnc();
