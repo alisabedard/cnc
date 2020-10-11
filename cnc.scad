@@ -179,8 +179,10 @@ module SainSmart100() {
 module Spindle() {
   SpindleHeight=100;
     color("Gray") 
-      cylinder(d=52,
-        h=SpindleHeight);
+      hull(){
+        cylinder(d=52, h=SpindleHeight);
+        cylinder(d=40, h=SpindleHeight+10);
+      }
   ColletHeight=20;
   translate([0,0,-ColletHeight])
     color("Black") 
@@ -191,14 +193,8 @@ module Spindle() {
     color("Navy") 
       cylinder(d=EndMillDiameter,
         h=ColletHeight*2); 
-    translate([Width-40,Length/2,
-    Height+44])
-    rotate([0,0,270])
-  idler_pulley_plate();
-
 }
 module CncZ(Width, Length, Height) {
-  CncZPlate(Width,Length,Height);
   OffsetX=30;
   OffsetY=75;
   OffsetZ=70;
@@ -208,9 +204,9 @@ module CncZ(Width, Length, Height) {
   SpindleX=Width/2;
   SpindleY=Length/2-OffsetY-56;
   SpindleZ=Height-40;
-  translate([SpindleX,SpindleY,
-    SpindleZ])
+  translate([SpindleX,SpindleY, SpindleZ])
     Spindle();
+  CncZPlate(Width,Length,Height);
 }
 module CncX(Width, Length, Height) {
   // gantry towers
@@ -238,9 +234,25 @@ module CncX(Width, Length, Height) {
 
 }
 module CncTable(Width, Length, Height) {
-  build_plate();
+  TableWidth=Width/3*2;
+  TableX=TableWidth/4;
+  TableY=Width/2;
+  translate([TableX,TableY,80])
+    rotate([90,0,90])
+      Extrusion(20,80,TableWidth);
 }
 module CncY(Width, Length, Height) {
+  translate([Width/3,Length, 50])
+    rotate([90,0,0])
+      Extrusion(20,20,Length);
+  translate([2*Width/3,Length, 50])
+    rotate([90,0,0])
+      Extrusion(20,20,Length);
+    
+  translate([Width/3,Length/2, 62])
+    CncVPlate();
+  translate([2*Width/3,Length/2, 62])
+    CncVPlate();
   CncTable(Width, Length, Height);
 }
 module Cnc() {
