@@ -1,10 +1,11 @@
+include <openscad-openbuilds/brackets/angle_corner.scad>
 include <openscad-openbuilds/linear_rails/vslot.scad>
 include <openscad-openbuilds/plates/vslot_gantry_plate.scad>
-include <openscad-openbuilds/wheels/vwheel.scad>
-include <openscad-openbuilds/shims_and_spacers/spacer.scad>
-include <openscad-openbuilds/shims_and_spacers/shim.scad>
 include <openscad-openbuilds/plates/motor_mount_plate.scad>
 include <openscad-openbuilds/plates/build_plate.scad>
+include <openscad-openbuilds/shims_and_spacers/spacer.scad>
+include <openscad-openbuilds/shims_and_spacers/shim.scad>
+include <openscad-openbuilds/wheels/vwheel.scad>
 include <MCAD/motors.scad>
 IsDetailed=true;
 // Render error tolerance.
@@ -197,8 +198,8 @@ module CncZPlate(X, Y, Z) {
 module CncZ(Width, Length, Height) {
     GantryY=Length/4*3;
     X=Width/2;
-    Y=GantryY;
-    Z=Height;
+    Y=GantryY+4;
+    Z=Height-25;
     AxisX=X-30;
     AxisY=Y-20;
     AxisZ=Z-50;
@@ -224,7 +225,7 @@ module CncX(Width, Length, Height) {
     rotate([0,0,90])
       Extrusion(20,40,Height);
   // x rail
-  translate([0,GantryY+25,Height+24])
+  translate([0,GantryY+30,Height])
     rotate([0,90,0])
       Extrusion(20,40,Width);
       /*
@@ -240,7 +241,20 @@ module CncX(Width, Length, Height) {
     rotate([0,0,90])
       motor_mount_plate_nema17();
       */
-
+  // left bottom corner bracket
+  translate([20,GantryY+20,Height-20])
+    rotate([-90,0,0])
+      angle_corner();
+  // left top corner bracket
+  translate([20,GantryY+20,Height+20])
+    angle_corner();
+  // right bottom corner bracket
+  translate([Width,GantryY+20,Height-20])
+    rotate([-90,0,0])
+      angle_corner();
+  // right top corner bracket
+  translate([Width,GantryY+20,Height+20])
+    angle_corner();
 }
 module YVPlate() {
   CncVPlate();
