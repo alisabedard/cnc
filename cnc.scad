@@ -58,11 +58,11 @@ module CncIdlers(Length, Width, Height) {
   idler_pulley_plate();
 }
 module CncWheel(X, Y) {
-  translate([X,Y,-12])
+  translate([X,Y,-14])
     vwheel();
-  translate([X,Y,-7])
+  translate([X,Y,-9])
     precision_shim();
-  translate([X,Y,-6])
+  translate([X,Y,-8])
     spacer();
 }
 module CncVPlate() {
@@ -82,9 +82,8 @@ module CncGantryPlate() {
   CncWheel(30,30);
   CncWheel(30,-30);
 }
-module CncZPlate(Width,
-  Length, Height) {
-  translate([Width/2,Length/2-42, Height+25])
+module CncZPlate(Width, Length, Height) {
+  translate([Width/2,Length/2-44, Height+25])
   rotate([0,90,270])
   CncGantryPlate();
 }
@@ -211,14 +210,15 @@ module CncZ(Width, Length, Height) {
 }
 module CncX(Width, Length, Height) {
   // gantry towers
-  translate([10,Length/2,40])
+  GantryY=Length/4*3;
+  translate([10,GantryY,40])
     rotate([0,0,90])
       Extrusion(20,40,Height);
-  translate([Width-10,Length/2,40])
+  translate([Width-10,GantryY,40])
     rotate([0,0,90])
       Extrusion(20,40,Height);
   // x rail
-  translate([0,Length/2-30,Height+24])
+  translate([0,GantryY+25,Height+24])
     rotate([0,90,0])
       Extrusion(20,40,Width);
       /*
@@ -235,6 +235,11 @@ module CncX(Width, Length, Height) {
       motor_mount_plate_nema17();
       */
 
+}
+module YVPlate() {
+  CncVPlate();
+  translate([0,0,1])
+  spacer();
 }
 module CncTable(Width, Length, Height) {
   TableWidth=Width/3*2;
@@ -253,9 +258,9 @@ module CncY(Width, Length, Height) {
       Extrusion(20,20,Length);
     
   translate([Width/3,Length/2, 62])
-    CncVPlate();
+    YVPlate();
   translate([2*Width/3,Length/2, 62])
-    CncVPlate();
+    YVPlate();
 //  CncTable(Width, Length, Height);
 }
 module Cnc() {
