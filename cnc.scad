@@ -241,33 +241,53 @@ module CncX(Width, Length, Height) {
     rotate([0,0,90])
       motor_mount_plate_nema17();
       */
-  // left bottom corner bracket
+  // left corner brackets
   translate([20,GantryY+20,Height-20])
     rotate([-90,0,0])
       angle_corner();
-  // left top corner bracket
   translate([20,GantryY+20,Height+20])
     angle_corner();
-  // right bottom corner bracket
+  translate([20,GantryY+20,40])
+    angle_corner();
+  translate([0,GantryY-20,40])
+    rotate([0,0,180])
+      angle_corner();
+  // right corner brackets
   translate([Width,GantryY+20,Height-20])
     rotate([-90,0,0])
       angle_corner();
-  // right top corner bracket
   translate([Width,GantryY+20,Height+20])
     angle_corner();
+  translate([Width,GantryY+20,40])
+    angle_corner();
+  translate([Width-20,GantryY-20,40])
+    rotate([0,0,180])
+      angle_corner();
 }
 module YVPlate() {
   CncVPlate();
-  translate([0,0,1])
-  spacer();
+  translate([0,20,0])
+    spacer();
+  translate([20,0,0])
+    spacer();
+  translate([-20,0,0])
+    spacer();
+  translate([0,-20,0])
+    spacer();
+}
+module CncWasteBoard(Width, Length) {
+  color("Brown")
+    cube([Width/3*2,Length/2,6]);
 }
 module CncTable(Width, Length, Height) {
   TableWidth=Width/3*2;
   TableX=TableWidth/4;
-  TableY=Width/2;
+  TableY=Length/2;
   translate([TableX,TableY,80])
     rotate([90,0,90])
       Extrusion(20,80,TableWidth);
+  translate([TableX,TableY-Length/4,90])
+    CncWasteBoard(Width,Length);
 }
 module CncY(Width, Length, Height) {
   translate([Width/3,Length, 50])
@@ -276,16 +296,17 @@ module CncY(Width, Length, Height) {
   translate([2*Width/3,Length, 50])
     rotate([90,0,0])
       Extrusion(20,20,Length);
-    
-  translate([Width/3,Length/2, 62])
+  PlateZ=64;  
+  translate([Width/3,Length/2, PlateZ])
     YVPlate();
-  translate([2*Width/3,Length/2, 62])
+  translate([2*Width/3,Length/2, PlateZ])
     YVPlate();
-//  CncTable(Width, Length, Height);
+  // build area
+  CncTable(Width, Length, Height);
 }
 module Cnc() {
   Width = 250;
-  Length = 250;
+  Length = 200;
   Height = 200;
   CncBase(Width, Length);
   CncX(Width, Length, Height);
