@@ -1,3 +1,4 @@
+include <openscad-openbuilds/hardware/acme_lead_screw_nut.scad>
 include <openscad-openbuilds/brackets/angle_corner.scad>
 include <openscad-openbuilds/linear_rails/vslot.scad>
 include <openscad-openbuilds/plates/vslot_gantry_plate.scad>
@@ -278,12 +279,13 @@ module YVPlate() {
   translate([0,-20,0])
     spacer();
 }
+/*
 module CncWasteBoard(Width, Length) {
   color("Brown")
     cube([Width/3*2,Length/2,6]);
 }
-module CncTable(Width, Length, Height) {
-  TableWidth=Width/3*2;
+module CncTable(TableWidth, TableLength, Height) {
+//  TableWidth=Width/3*2;
   TableX=TableWidth/4;
   TableY=Length/2;
   translate([TableX,TableY,80])
@@ -291,22 +293,66 @@ module CncTable(Width, Length, Height) {
       Extrusion(20,80,TableWidth);
   translate([TableX,TableY-Length/4,90])
     CncWasteBoard(Width,Length);
+}*/
+module CncWasteBoard(TableWidth, TableLength) {
+  BoardHeight=6;
+  color("Brown")
+    cube([TableWidth,TableLength,BoardHeight]);
+}
+module CncTable(TableWidth, TableLength) {
+  translate([0,40+(TableLength-80)/2,10])
+    rotate([90,0,90])
+      Extrusion(20,80,TableWidth);
+  translate([0,0,20])
+    CncWasteBoard(TableWidth, TableLength);
 }
 module CncY(Width, Length, Height) {
   CouplerLength=25;
-  translate([Width/3,Length, 50])
-    rotate([90,0,0])
-      Extrusion(20,20,Length);
-  translate([2*Width/3,Length, 50])
-    rotate([90,0,0])
-      Extrusion(20,20,Length);
+  Spread=20;
+  HalfSpread=Spread/2;
+  TableWidth=100;
+  TableLength=100;
+  PlateWidth=65.5;
+  NutBlockWidth=34;
+  RailSpace=PlateWidth+NutBlockWidth;
+  /* Use this to set the carriage position.  This can be used to make sure
+  that the tool head can reach all parts of the table.  */
+  //Y=-70;// max
+  //Y=-Length/3;
+  //Y=40;// min
+  //Y=Length/7;
+  Y=0;
+  Offset=PlateWidth+NutBlockWidth;
+  translate([Width/2-TableWidth/2,0,0]){
+    // left rail
+    translate([0,Length, 50])
+      rotate([90,0,0])
+        Extrusion(20,20,Length);
+    // right rail
+    translate([Offset,Length, 50])
+      rotate([90,0,0])
+        Extrusion(20,20,Length);
+  }
   PlateZ=64;  
-  translate([Width/3,Length/2, PlateZ])
-    YVPlate();
-  translate([2*Width/3,Length/2, PlateZ])
-    YVPlate();
-  // build area
-  CncTable(Width, Length, Height);
+  // carriage movement
+  translate([Width/2-TableWidth/2,Length/2-TableLength/2+Y,0]){
+    // left plate
+    translate([0,50, PlateZ])
+      YVPlate();
+    // right plate
+    translate([Offset,50,PlateZ])
+      YVPlate();
+    // build area
+    translate([0,0,70])
+      CncTable(TableWidth,TableLength);
+    // nut block
+    translate([Offset/2,TableLength/2+3,54])
+      rotate([0,0,0]) {
+        acme_lead_screw_nut_block_anti_backlash();
+        translate([-10,6.5,12]) spacer();
+        translate([10,6.5,12]) spacer();
+      }
+  }
   // motor plate
   translate([Width/2-20,Length+3,0])
     rotate([90,0,0])
@@ -315,12 +361,13 @@ module CncY(Width, Length, Height) {
   translate([Width/2,Length+3,60])
     rotate([90,0,0])
       stepper_motor_mount(17);
+      // motor(model=Nema17);
   // leadscrew
   LeadScrewDiameter=8;
   translate([Width/2,Length-CouplerLength,60])
     rotate([90,0,0])
       color("Silver")
-        cylinder(d=LeadScrewDiameter,h=Length);
+        cylinder(d=LeadScrewDiameter,h=Length-CouplerLength);
   // coupler
   UseCoupler=true;
   if (UseCoupler) {
@@ -333,9 +380,12 @@ module Cnc() {
   Width = 250;
   Length = 200;
   Height = 200;
+  // Use this to move the X carriage:
+  X=-50;
   CncBase(Width, Length);
   CncX(Width, Length, Height);
   CncY(Width, Length, Height);
+  translate([X,0,0])
   CncZ(Width, Length, Height);
 }
 Cnc();
