@@ -83,6 +83,12 @@ module CncGantryPlate() {
   CncWheel(30,30);
   CncWheel(30,-30);
 }
+module Coupler(Diameter) {
+  CouplerLength=25;
+  color("Blue")
+    cylinder(d=Diameter,
+      h=CouplerLength);
+}
 module SainSmart100() {
   /* This is baed on SainSmart 
   100mm linear actuator with ball
@@ -91,9 +97,9 @@ module SainSmart100() {
   */
   CarriageWidth=78;
   CarriageHeight=60;
+  CouplerLength=25;
   Travel=100;
   ScrewLength=170;
-  CouplerLength=25;
   ExtrusionHeight=ScrewLength+
     CouplerLength;
   ExtrusionWidth=30;
@@ -133,11 +139,8 @@ module SainSmart100() {
       cylinder(d=Diameter,
         h=ScrewLength);
   // coupler
-  translate([PlateWidth/2,
-    -PlateLength/4,Plate+ScrewLength])
-    color("Blue")
-      cylinder(d=Diameter*2,
-        h=CouplerLength);
+  translate([PlateWidth/2, -PlateLength/4,Plate+ScrewLength])
+    Coupler(Diameter*2);
   // carriage
   CarriageLength=ExtrusionWidth;
   translate([-(CarriageWidth-
@@ -290,6 +293,7 @@ module CncTable(Width, Length, Height) {
     CncWasteBoard(Width,Length);
 }
 module CncY(Width, Length, Height) {
+  CouplerLength=25;
   translate([Width/3,Length, 50])
     rotate([90,0,0])
       Extrusion(20,20,Length);
@@ -303,6 +307,27 @@ module CncY(Width, Length, Height) {
     YVPlate();
   // build area
   CncTable(Width, Length, Height);
+  // motor plate
+  translate([Width/2-20,Length+3,0])
+    rotate([90,0,0])
+      motor_mount_plate_nema17();
+  // motor
+  translate([Width/2,Length+3,60])
+    rotate([90,0,0])
+      stepper_motor_mount(17);
+  // leadscrew
+  LeadScrewDiameter=8;
+  translate([Width/2,Length-CouplerLength,60])
+    rotate([90,0,0])
+      color("Silver")
+        cylinder(d=LeadScrewDiameter,h=Length);
+  // coupler
+  UseCoupler=true;
+  if (UseCoupler) {
+    translate([Width/2,Length-CouplerLength/2,60])
+      rotate([90,0,0])
+        Coupler(LeadScrewDiameter * 2);
+  }
 }
 module Cnc() {
   Width = 250;
