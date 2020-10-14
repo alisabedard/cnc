@@ -300,30 +300,24 @@ module CncWasteBoard(TableWidth, TableLength) {
     cube([TableWidth,TableLength,BoardHeight]);
 }
 module CncTable(TableWidth, TableLength) {
-  translate([0,40+(TableLength-80)/2,10])
+  translate([0,40+(TableLength-60)/2,10])
     rotate([90,0,90])
-      Extrusion(20,80,TableWidth);
-  translate([0,0,20])
+      Extrusion(20,60,TableWidth);
+  translate([0,10,20])
     CncWasteBoard(TableWidth, TableLength);
 }
-module CncY(Width, Length, Height) {
+module CncY(Width, Length, Height, Y) {
   CouplerLength=25;
   Spread=20;
   HalfSpread=Spread/2;
-  TableWidth=100;
+  TableWidth=150;
   TableLength=100;
   PlateWidth=65.5;
   NutBlockWidth=34;
+  NutBlockLength=33;
   RailSpace=PlateWidth+NutBlockWidth;
-  /* Use this to set the carriage position.  This can be used to make sure
-  that the tool head can reach all parts of the table.  */
-  //Y=-70;// max
-  //Y=-Length/3;
-  //Y=40;// min
-  //Y=Length/7;
-  Y=0;
   Offset=PlateWidth+NutBlockWidth;
-  translate([Width/2-TableWidth/2,0,0]){
+  translate([Width/2-Offset/2,0,0]){
     // left rail
     translate([0,Length, 50])
       rotate([90,0,0])
@@ -334,25 +328,24 @@ module CncY(Width, Length, Height) {
         Extrusion(20,20,Length);
   }
   PlateZ=64;  
-  // carriage movement
-  translate([Width/2-TableWidth/2,Length/2-TableLength/2+Y,0]){
-    // left plate
-    translate([0,50, PlateZ])
-      YVPlate();
-    // right plate
-    translate([Offset,50,PlateZ])
-      YVPlate();
-    // build area
-    translate([0,0,70])
-      CncTable(TableWidth,TableLength);
-    // nut block
-    translate([Offset/2,TableLength/2+3,54])
-      rotate([0,0,0]) {
-        acme_lead_screw_nut_block_anti_backlash();
-        translate([-10,6.5,12]) spacer();
-        translate([10,6.5,12]) spacer();
-      }
-  }
+  PlateY=Length/2+Y+PlateWidth-5;
+  // left plate
+  translate([Width/2-Offset/2, PlateY, PlateZ])
+    YVPlate();
+  // right plate
+  translate([Width/2+Offset/2,PlateY,PlateZ])
+    YVPlate();
+  // build area
+  translate([Width/2-TableWidth/2,Length/2+Y,70])
+    CncTable(TableWidth,TableLength);
+  // nut block
+  translate([Width/2,Length/2+Y+NutBlockLength,PlateZ-10])
+    rotate([0,0,0]) {
+      acme_lead_screw_nut_block_anti_backlash();
+      translate([-10,6.5,12]) spacer();
+      translate([10,6.5,12]) spacer();
+    }
+
   // motor plate
   translate([Width/2-20,Length+3,0])
     rotate([90,0,0])
@@ -377,15 +370,18 @@ module CncY(Width, Length, Height) {
   }
 }
 module Cnc() {
-  Width = 250;
+  Width = 300;
   Length = 200;
   Height = 200;
-  // Use this to move the X carriage:
-  X=-50;
+  // Use this to move the carriages:
+  X=-Width/4; // min
+  //X=Width/4; // max
+  Y=-Length/4;
+  Z=0;
   CncBase(Width, Length);
   CncX(Width, Length, Height);
-  CncY(Width, Length, Height);
+  CncY(Width, Length, Height, Y);
   translate([X,0,0])
-  CncZ(Width, Length, Height);
+    CncZ(Width, Length, Height, Z);
 }
 Cnc();
