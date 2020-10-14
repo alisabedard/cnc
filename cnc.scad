@@ -90,7 +90,7 @@ module Coupler(Diameter) {
     cylinder(d=Diameter,
       h=CouplerLength);
 }
-module SainSmart100() {
+module SainSmart100(Z) {
   /* This is baed on SainSmart 
   100mm linear actuator with ball
   screw.
@@ -147,7 +147,7 @@ module SainSmart100() {
   translate([-(CarriageWidth-
     ExtrusionLength)/2,-CarriageLength,
     Plate+ScrewLength/2-
-    CarriageHeight/2]){
+    CarriageHeight/2+Z]){
       color("Silver")
         difference(){
           Slot=CarriageHeight/10;
@@ -199,25 +199,27 @@ module CncZPlate(X, Y, Z) {
     rotate([0,90,270])
       CncGantryPlate();
 }
-module CncZ(Width, Length, Height) {
-    GantryY=Length/4*3;
-    X=Width/2;
-    Y=GantryY+4;
-    Z=Height-25;
-    AxisX=X-30;
-    AxisY=Y-20;
-    AxisZ=Z-50;
-    translate([AxisX,AxisY,AxisZ])
-      SainSmart100();
-    SpindleX=AxisX+30;
-    SpindleY=AxisY-56;
-    SpindleZ=AxisZ+20;
-    translate([SpindleX,SpindleY,SpindleZ])
-      Spindle();
-    PlateX=X;
-    PlateY=Y+12;
-    PlateZ=Z+25;
-    CncZPlate(PlateX,PlateY,PlateZ);
+module CncZ(Width, Length, Height, CarriageZ) {
+  CarriageZAdjusted=CarriageZ-55;
+  GantryY=Length/4*3;
+  X=Width/2;
+  Y=GantryY+4;
+  Z=Height-25;
+  AxisToPlateOffset=-10;
+  AxisX=X-30;
+  AxisY=Y-20;
+  AxisZ=Z-50+AxisToPlateOffset;
+  translate([AxisX,AxisY,AxisZ])
+    SainSmart100(CarriageZAdjusted);
+  SpindleX=AxisX+30;
+  SpindleY=AxisY-56;
+  SpindleZ=AxisZ+20+CarriageZAdjusted;
+  translate([SpindleX,SpindleY,SpindleZ])
+    Spindle();
+  PlateX=X;
+  PlateY=Y+12;
+  PlateZ=Z+25;
+  CncZPlate(PlateX,PlateY,PlateZ);
 }
 module CncX(Width, Length, Height) {
   // gantry towers
@@ -372,12 +374,14 @@ module CncY(Width, Length, Height, Y) {
 module Cnc() {
   Width = 300;
   Length = 200;
-  Height = 200;
+  Height = 250;
   // Use this to move the carriages:
   X=-Width/4; // min
   //X=Width/4; // max
   Y=-Length/4;
-  Z=0;
+  //Z=75; // max
+  /* The tool should be able to cut waste board but not extrusion.  */
+  Z=0; // min
   CncBase(Width, Length);
   CncX(Width, Length, Height);
   CncY(Width, Length, Height, Y);
