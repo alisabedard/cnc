@@ -281,39 +281,25 @@ module YVPlate() {
   translate([0,-20,0])
     spacer();
 }
-/*
-module CncWasteBoard(Width, Length) {
-  color("Brown")
-    cube([Width/3*2,Length/2,6]);
-}
-module CncTable(TableWidth, TableLength, Height) {
-//  TableWidth=Width/3*2;
-  TableX=TableWidth/4;
-  TableY=Length/2;
-  translate([TableX,TableY,80])
-    rotate([90,0,90])
-      Extrusion(20,80,TableWidth);
-  translate([TableX,TableY-Length/4,90])
-    CncWasteBoard(Width,Length);
-}*/
-module CncWasteBoard(TableWidth, TableLength) {
+module CncTable(Width, Length, Height, Y) {
+  BoardWidth=Width-80;
+  BoardLength=Length/2;
   BoardHeight=6;
-  color("Brown")
-    cube([TableWidth,TableLength,BoardHeight]);
-}
-module CncTable(TableWidth, TableLength) {
-  translate([0,40+(TableLength-60)/2,10])
+  ExtrusionWidth=Width/3*2;
+  translate([(Width-ExtrusionWidth)/2,Y,80])
     rotate([90,0,90])
-      Extrusion(20,60,TableWidth);
-  translate([0,10,20])
-    CncWasteBoard(TableWidth, TableLength);
+      Extrusion(20,60,ExtrusionWidth);
+  translate([(Width-BoardWidth)/2,Y-Length/4,90])
+    color("Brown")
+      cube([BoardWidth,BoardLength,BoardHeight]);
 }
-module CncY(Width, Length, Height, Y) {
+module CncY(Width, Length, Height, YParam) {
+  Y=YParam+30;
   CouplerLength=25;
   Spread=20;
   HalfSpread=Spread/2;
-  TableWidth=150;
-  TableLength=100;
+  TableWidth=Width/4*3;
+  TableLength=Length;
   PlateWidth=65.5;
   NutBlockWidth=34;
   NutBlockLength=33;
@@ -330,7 +316,8 @@ module CncY(Width, Length, Height, Y) {
         Extrusion(20,20,Length);
   }
   PlateZ=64;  
-  PlateY=Length/2+Y+PlateWidth-5;
+//  PlateY=Length/2+Y+PlateWidth-5;
+  PlateY=Y;
   // left plate
   translate([Width/2-Offset/2, PlateY, PlateZ])
     YVPlate();
@@ -338,10 +325,9 @@ module CncY(Width, Length, Height, Y) {
   translate([Width/2+Offset/2,PlateY,PlateZ])
     YVPlate();
   // build area
-  translate([Width/2-TableWidth/2,Length/2+Y,70])
-    CncTable(TableWidth,TableLength);
+  CncTable(Width,Length,Height,Y);
   // nut block
-  translate([Width/2,Length/2+Y+NutBlockLength,PlateZ-10])
+  translate([Width/2,Y,PlateZ-10])
     rotate([0,0,0]) {
       acme_lead_screw_nut_block_anti_backlash();
       translate([-10,6.5,12]) spacer();
@@ -378,7 +364,8 @@ module Cnc() {
   // Use this to move the carriages:
   X=-Width/4; // min
   //X=Width/4; // max
-  Y=-Length/4;
+  Y=Length/2;
+  //Y=0;
   //Z=75; // max
   /* The tool should be able to cut waste board but not extrusion.  */
   Z=0; // min
