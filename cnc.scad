@@ -281,17 +281,20 @@ module YVPlate() {
   translate([0,-20,0])
     spacer();
 }
-module CncTable(Width, Length, Height, Y) {
+module CncWasteBoard(Width,Length,Y) {
   BoardWidth=Width-80;
-  BoardLength=Length/2;
+  BoardLength=Length/1.5;
   BoardHeight=6;
-  ExtrusionWidth=Width/3*2;
+  translate([(Width-BoardWidth)/2,Y-BoardLength/2,90])
+    color("Brown")
+      cube([BoardWidth,BoardLength,BoardHeight]);
+}
+module CncTable(Width, Length, Height, Y) {
+  ExtrusionWidth=Width-50;
   translate([(Width-ExtrusionWidth)/2,Y,80])
     rotate([90,0,90])
       Extrusion(20,60,ExtrusionWidth);
-  translate([(Width-BoardWidth)/2,Y-Length/4,90])
-    color("Brown")
-      cube([BoardWidth,BoardLength,BoardHeight]);
+  CncWasteBoard(Width,Length,Y);
 }
 module CncY(Width, Length, Height, YParam) {
   Y=YParam+30;
