@@ -8,6 +8,7 @@ include <openscad-openbuilds/shims_and_spacers/spacer.scad>
 include <openscad-openbuilds/shims_and_spacers/shim.scad>
 include <openscad-openbuilds/wheels/vwheel.scad>
 include <MCAD/motors.scad>
+include <MCAD/metric_fastners.scad>
 IsDetailed=true;
 // Render error tolerance.
 E=0.01;
@@ -281,20 +282,46 @@ module YVPlate() {
   translate([0,-20,0])
     spacer();
 }
-module CncWasteBoard(Width,Length,Y) {
+module FenderWasher(){
+  Inner=8.4;
+  Thick=2;
+  Outer=24;
+  Error=0.1;
+  difference(){
+    color("Gray")
+      cylinder(d=Outer,h=Thick);
+    translate([0,0,-Error])
+      cylinder(d=Inner,h=Thick+Error*2);
+  }
+}
+module CncTableClamp(Width,Length,X,Y,Z) {
+  translate([X,Y,Z])
+    FenderWasher();
+  translate([X,Y,Z+2])
+    color("Silver")
+      washer(5);
+}
+module CncTableClamps(Width,Length,Y,Z) {
+  CncTableClamp(Width,Length,35,Y,Z);
+  CncTableClamp(Width,Length,Width-35,Y,Z);
+}
+module CncWasteBoard(Width,Length,BoardHeight,Y) {
   BoardWidth=Width-80;
   BoardLength=Length/1.5;
-  BoardHeight=6;
   translate([(Width-BoardWidth)/2,Y-BoardLength/2,90])
     color("Brown")
       cube([BoardWidth,BoardLength,BoardHeight]);
 }
 module CncTable(Width, Length, Height, Y) {
+  BoardHeight=6;
   ExtrusionWidth=Width-50;
-  translate([(Width-ExtrusionWidth)/2,Y,80])
+  ExtrusionZ=80;
+  Z=ExtrusionZ+10;
+  translate([(Width-ExtrusionWidth)/2,Y,ExtrusionZ])
     rotate([90,0,90])
       Extrusion(20,60,ExtrusionWidth);
-  CncWasteBoard(Width,Length,Y);
+  CncWasteBoard(Width,Length,BoardHeight,Y);
+  CncTableClamps(Width,Length,Y,Z+BoardHeight);
 }
 module CncY(Width, Length, Height, YParam) {
   Y=YParam+30;
