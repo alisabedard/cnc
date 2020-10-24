@@ -202,9 +202,9 @@ module CncZPlate(X, Y, Z) {
 }
 module CncZ(Width, Length, Height, CarriageZ) {
   CarriageZAdjusted=CarriageZ-55;
-  GantryY=Length/4*3;
+  GantryY=Length-37;
   X=Width/2;
-  Y=GantryY+4;
+  Y=GantryY;
   Z=Height-25;
   AxisToPlateOffset=-10;
   AxisX=X-30;
@@ -409,12 +409,14 @@ module PCB(Width,Length,Height) {
       cube([XDim,YDim,ZDim]);
 }
 module Cnc() {
-  Width = 300;
-  Length = 200;
+  /* It was advisable to keep existing extrusion lengths.  The original
+  machine has 4 500mm x and y extrusions and 2 250mm z extrusions.  */
+  Width = 500;
+  Length = 500;
   Height = 250;
   // Use this to move the carriages:
-  X=-Width/4; // min
-  //X=Width/4; // max
+  //X=-Width/2+70; // min
+  X=Width/2-70; // max
   Y=Length-85;
   //Y=0;
   //Z=75; // max
