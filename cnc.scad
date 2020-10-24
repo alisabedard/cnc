@@ -200,16 +200,15 @@ module CncZPlate(X, Y, Z) {
     rotate([0,90,270])
       CncGantryPlate();
 }
-module CncZ(Width, Length, Height, CarriageZ) {
+module CncZ(Width, Length, Height, CarriageZ, GantryY) {
   CarriageZAdjusted=CarriageZ-55;
-  GantryY=Length-37;
   X=Width/2;
   Y=GantryY;
   Z=Height-25;
   AxisToPlateOffset=-10;
   AxisX=X-30;
   AxisY=Y-20;
-  AxisZ=Z-50+AxisToPlateOffset;
+  AxisZ=Z-60+AxisToPlateOffset;
   translate([AxisX,AxisY,AxisZ])
     SainSmart100(CarriageZAdjusted);
   SpindleX=AxisX+30;
@@ -222,9 +221,8 @@ module CncZ(Width, Length, Height, CarriageZ) {
   PlateZ=Z+25;
   CncZPlate(PlateX,PlateY,PlateZ);
 }
-module CncX(Width, Length, Height) {
+module CncX(Width, Length, Height, GantryY) {
   // gantry towers
-  GantryY=Length-40;
   translate([10,GantryY,40])
     rotate([0,0,90])
       Extrusion(20,40,Height);
@@ -294,34 +292,44 @@ module FenderWasher(){
       cylinder(d=Inner,h=Thick+Error*2);
   }
 }
-module CncTableClamp(Width,Length,X,Y,Z) {
+module CncTableClamp(X,Y,Z) {
   translate([X,Y,Z])
     FenderWasher();
   translate([X,Y,Z+2])
     color("Silver")
       washer(5);
 }
-module CncTableClamps(Width,Length,Y,Z) {
-  CncTableClamp(Width,Length,35,Y,Z);
-  CncTableClamp(Width,Length,Width-35,Y,Z);
+module CncTableClamps(Y,Z,Width,ExtrusionWidth) {
+  CncTableClamp(Width-ExtrusionWidth,Y,Z);
+  CncTableClamp(Width-(Width-ExtrusionWidth),Y,Z);
 }
-module CncWasteBoard(Width,Length,BoardHeight,Y) {
-  BoardWidth=Width-80;
-  BoardLength=Length/1.5;
-  translate([(Width-BoardWidth)/2,Y-BoardLength/2,90])
+module CncWasteBoard(Width,Length,BoardHeight,Y,ExtrusionWidth) {
+  BoardWidth=ExtrusionWidth-(Width-ExtrusionWidth);
+  //BoardLength=Length/1.5;
+  BoardLength=Length/2;
+  translate([(Width-BoardWidth)/2,Y-BoardLength/2+Length/8,70])
     color("Brown")
       cube([BoardWidth,BoardLength,BoardHeight]);
+  translate([(Width-BoardWidth)/2,Y-BoardLength/2+Length/8,70+BoardHeight])
+    color("Yellow")
+      cube([BoardWidth,BoardLength,BoardHeight]);
+  echo(str("Base board needed: ", BoardWidth, "mm by ", BoardLength,
+    "mm by ", BoardHeight, "mm"));
+  echo(str("Waste board needed: ", BoardWidth, "mm by ", BoardLength,
+    "mm by ", BoardHeight, "mm"));
 }
 module CncTable(Width, Length, Height, Y) {
   BoardHeight=6;
-  ExtrusionWidth=Width-50;
+  ExtrusionWidth=Width-40-5;
   ExtrusionZ=80;
   Z=ExtrusionZ+10;
+  /*
   translate([(Width-ExtrusionWidth)/2,Y,ExtrusionZ])
     rotate([90,0,90])
       Extrusion(20,60,ExtrusionWidth);
-  CncWasteBoard(Width,Length,BoardHeight,Y);
-  CncTableClamps(Width,Length,Y,Z+BoardHeight);
+      */
+  CncWasteBoard(Width,Length,BoardHeight,Y,ExtrusionWidth);
+//  CncTableClamps(Y,Z+BoardHeight,Width,ExtrusionWidth);
 }
 module CncY(Width, Length, Height, YParam) {
   Y=YParam+30;
@@ -334,30 +342,35 @@ module CncY(Width, Length, Height, YParam) {
   NutBlockWidth=34;
   NutBlockLength=33;
   RailSpace=PlateWidth+NutBlockWidth;
-  Offset=PlateWidth+NutBlockWidth;
-  translate([Width/2-Offset/2,0,0]){
+  Offset=Width/4;
     // left rail
-    translate([0,Length, 50])
-      rotate([90,0,0])
-        Extrusion(20,20,Length);
-    // right rail
     translate([Offset,Length, 50])
       rotate([90,0,0])
         Extrusion(20,20,Length);
-  }
+    // right rail
+    translate([Width-Offset,Length, 50])
+      rotate([90,0,0])
+        Extrusion(20,20,Length);
   PlateZ=64;  
-//  PlateY=Length/2+Y+PlateWidth-5;
   PlateY=Y;
-  // left plate
-  translate([Width/2-Offset/2, PlateY, PlateZ])
+  RearPlateY=PlateY+Length/4;
+  // front left plate
+  translate([Offset, PlateY, PlateZ])
     YVPlate();
-  // right plate
-  translate([Width/2+Offset/2,PlateY,PlateZ])
+  // front right plate
+  translate([Width-Offset,PlateY,PlateZ])
     YVPlate();
+  // rear left plate
+  translate([Offset, RearPlateY, PlateZ])
+    YVPlate();
+  // rear right plate
+  translate([Width-Offset,RearPlateY,PlateZ])
+    YVPlate();
+
   // build area
   CncTable(Width,Length,Height,Y);
   // nut block
-  translate([Width/2,Y,PlateZ-10])
+  translate([Width/2,Y+Width/8,PlateZ-10])
     rotate([0,0,0]) {
       acme_lead_screw_nut_block_anti_backlash();
       translate([-10,6.5,12]) spacer();
@@ -387,24 +400,24 @@ module CncY(Width, Length, Height, YParam) {
         Coupler(LeadScrewDiameter * 2);
   }
 }
-module PSU(Width,Length,Height) {
+module PSU(Width,Length,Height,GantryY) {
   // https://tinyurl.com/y3k89ywv
   ZDim=215;
   YDim=115;
   XDim=50;
-  translate([Width,Length-YDim/2-40,40])
+  translate([Width,GantryY-YDim/2,40])
     color("Silver")
       cube([XDim,YDim,ZDim]);
 }
-module PCB(Width,Length,Height) {
+module PCB(Width,Length,Height,GantryY) {
   ZDim=80;
   YDim=80;
   XDim=3;
   Z2=Height/2;
-  translate([-XDim,Length-YDim/2-40,40])
+  translate([-XDim,GantryY-40,40])
     color("Green")
       cube([XDim,YDim,ZDim]);
-  translate([-XDim,Length-YDim/2-40,Z2])
+  translate([-XDim,GantryY-40,Z2])
     color("Green")
       cube([XDim,YDim,ZDim]);
 }
@@ -417,17 +430,19 @@ module Cnc() {
   // Use this to move the carriages:
   //X=-Width/2+70; // min
   X=Width/2-70; // max
-  Y=Length-85;
-  //Y=0;
+  //Y=Length-85;
+  Y=0;
   //Z=75; // max
   /* The tool should be able to cut waste board but not extrusion.  */
   Z=0; // min
+  //GantryY=Length-37;
+  GantryY=Length/2+20;//+40;
   CncBase(Width, Length);
-  CncX(Width, Length, Height);
+  CncX(Width, Length, Height, GantryY);
   CncY(Width, Length, Height, Y);
   translate([X,0,0])
-    CncZ(Width, Length, Height, Z);
-  PSU(Width,Length,Height);
-  PCB(Width,Length,Height);
+    CncZ(Width, Length, Height, Z, GantryY);
+  PSU(Width,Length,Height,GantryY);
+  PCB(Width,Length,Height,GantryY);
 }
 Cnc();
