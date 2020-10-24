@@ -224,7 +224,7 @@ module CncZ(Width, Length, Height, CarriageZ) {
 }
 module CncX(Width, Length, Height) {
   // gantry towers
-  GantryY=Length/4*3;
+  GantryY=Length-40;
   translate([10,GantryY,40])
     rotate([0,0,90])
       Extrusion(20,40,Height);
@@ -387,6 +387,27 @@ module CncY(Width, Length, Height, YParam) {
         Coupler(LeadScrewDiameter * 2);
   }
 }
+module PSU(Width,Length,Height) {
+  // https://tinyurl.com/y3k89ywv
+  ZDim=215;
+  YDim=115;
+  XDim=50;
+  translate([Width,Length-YDim/2-40,40])
+    color("Silver")
+      cube([XDim,YDim,ZDim]);
+}
+module PCB(Width,Length,Height) {
+  ZDim=80;
+  YDim=80;
+  XDim=3;
+  Z2=Height/2;
+  translate([-XDim,Length-YDim/2-40,40])
+    color("Green")
+      cube([XDim,YDim,ZDim]);
+  translate([-XDim,Length-YDim/2-40,Z2])
+    color("Green")
+      cube([XDim,YDim,ZDim]);
+}
 module Cnc() {
   Width = 300;
   Length = 200;
@@ -394,7 +415,7 @@ module Cnc() {
   // Use this to move the carriages:
   X=-Width/4; // min
   //X=Width/4; // max
-  Y=Length/2;
+  Y=Length-85;
   //Y=0;
   //Z=75; // max
   /* The tool should be able to cut waste board but not extrusion.  */
@@ -404,5 +425,7 @@ module Cnc() {
   CncY(Width, Length, Height, Y);
   translate([X,0,0])
     CncZ(Width, Length, Height, Z);
+  PSU(Width,Length,Height);
+  PCB(Width,Length,Height);
 }
 Cnc();
