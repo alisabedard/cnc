@@ -334,6 +334,12 @@ module CncYRail(X,Length) {
   translate([X,Length, 50])
     rotate([90,0,0])
       Extrusion(20,20,Length);
+  translate([X+10,20,40])
+    rotate([-90,0,0])
+      angle_corner();
+  translate([X+10,Length-20,40])
+    rotate([180,0,0])
+      angle_corner();
 }
 module CncYRails(Length,Width,Offset) {
   // left rail
@@ -402,6 +408,18 @@ module CncY(Width, Length, Height, YParam) {
       rotate([90,0,0])
         Coupler(LeadScrewDiameter * 2);
   }
+  // left front corners
+  translate([20,20,0]) rotate([0,90,0]) angle_corner();
+  translate([20,20,20]) rotate([0,90,0]) angle_corner();
+  // right front corners
+  translate([Width-20,20,0]) rotate([0,-90,0]) angle_corner();
+  translate([Width-20,20,20]) rotate([0,-90,0]) angle_corner();
+  // left rear corners
+  translate([20,Length-20,20]) rotate([-90,-90,-90]) angle_corner();
+  translate([20,Length-20,40]) rotate([-90,-90,-90]) angle_corner();
+  // right rear corners
+  translate([Width-20,Length-20,20]) rotate([-90,-90,180]) angle_corner();
+  translate([Width-20,Length-20,40]) rotate([-90,-90,180]) angle_corner();
 }
 module PSU(Width,Length,Height,GantryY) {
   // https://tinyurl.com/y3k89ywv
