@@ -412,8 +412,8 @@ module CncY(Width, Length, Height, YParam) {
   translate([20,20,0]) rotate([0,90,0]) angle_corner();
   translate([20,20,20]) rotate([0,90,0]) angle_corner();
   // right front corners
-  translate([Width-20,20,0]) rotate([0,-90,0]) angle_corner();
   translate([Width-20,20,20]) rotate([0,-90,0]) angle_corner();
+  translate([Width-20,20,40]) rotate([0,-90,0]) angle_corner();
   // left rear corners
   translate([20,Length-20,20]) rotate([-90,-90,-90]) angle_corner();
   translate([20,Length-20,40]) rotate([-90,-90,-90]) angle_corner();
