@@ -305,7 +305,6 @@ module CncTableClamps(Y,Z,Width,ExtrusionWidth) {
 }
 module CncWasteBoard(Width,Length,BoardHeight,Y,ExtrusionWidth) {
   BoardWidth=ExtrusionWidth-(Width-ExtrusionWidth);
-  //BoardLength=Length/1.5;
   BoardLength=Length/2;
   translate([(Width-BoardWidth)/2,Y-BoardLength/2+Length/8,70])
     color("Brown")
@@ -331,6 +330,17 @@ module CncTable(Width, Length, Height, Y) {
   CncWasteBoard(Width,Length,BoardHeight,Y,ExtrusionWidth);
 //  CncTableClamps(Y,Z+BoardHeight,Width,ExtrusionWidth);
 }
+module CncYRail(X,Length) {
+  translate([X,Length, 50])
+    rotate([90,0,0])
+      Extrusion(20,20,Length);
+}
+module CncYRails(Length,Width,Offset) {
+  // left rail
+  CncYRail(Offset,Length);
+  // right rail
+  CncYRail(Width-Offset,Length);
+}
 module CncY(Width, Length, Height, YParam) {
   Y=YParam+30;
   CouplerLength=25;
@@ -343,17 +353,10 @@ module CncY(Width, Length, Height, YParam) {
   NutBlockLength=33;
   RailSpace=PlateWidth+NutBlockWidth;
   Offset=Width/4;
-    // left rail
-    translate([Offset,Length, 50])
-      rotate([90,0,0])
-        Extrusion(20,20,Length);
-    // right rail
-    translate([Width-Offset,Length, 50])
-      rotate([90,0,0])
-        Extrusion(20,20,Length);
   PlateZ=64;  
   PlateY=Y;
   RearPlateY=PlateY+Length/4;
+  CncYRails(Length,Width,Offset);
   // front left plate
   translate([Offset, PlateY, PlateZ])
     YVPlate();
@@ -430,13 +433,18 @@ module Cnc() {
   // Use this to move the carriages:
   //X=-Width/2+70; // min
   X=Width/2-70; // max
-  //Y=Length-85;
-  Y=0;
+  /* Waste board movement is limited by y motor plate position.  */
+  GantryY=Length/2+30;//+40;
+  YAtBackEnd=Length*0.48;
+  YAtEndMill=YAtBackEnd;
+  //YDesired=Length/2; // max
+  YDesired=0; // min
+  Y=YAtEndMill-YDesired;
+  //Y=0;
   //Z=75; // max
   /* The tool should be able to cut waste board but not extrusion.  */
   Z=0; // min
   //GantryY=Length-37;
-  GantryY=Length/2+20;//+40;
   CncBase(Width, Length);
   CncX(Width, Length, Height, GantryY);
   CncY(Width, Length, Height, Y);
