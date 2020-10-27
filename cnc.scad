@@ -68,6 +68,14 @@ module CncWheel(X, Y) {
   translate([X,Y,-8])
     spacer();
 }
+module CncWheelDoubleSpaced(X, Y) {
+  translate([0,0,1])
+    CncWheel(X,Y);
+  translate([X,Y,-19])
+    precision_shim();
+  translate([X,Y,-25])
+    spacer();
+}
 module CncVPlate() {
   20mm_v_plate();
   CncWheel(-20,-20);
@@ -77,13 +85,6 @@ module CncVPlate() {
 }
 module universal_v_plate() {
   universel_v_plate();
-}
-module CncGantryPlate() {
-  universal_v_plate();
-  CncWheel(-30,30);
-  CncWheel(-30,-30);
-  CncWheel(30,30);
-  CncWheel(30,-30);
 }
 module Coupler(Diameter) {
   CouplerLength=25;
@@ -195,6 +196,16 @@ module Spindle() {
       cylinder(d=EndMillDiameter,
         h=ColletHeight*2); 
 }
+module CncGantryPlate() {
+  universal_v_plate();
+  CncWheelDoubleSpaced(-30,30);
+  CncWheelDoubleSpaced(-30,-30);
+  CncWheelDoubleSpaced(30,30);
+  CncWheelDoubleSpaced(30,-30);
+  translate([0,0,-26])
+    universal_v_plate();
+}
+//CncGantryPlate();
 module CncZPlate(X, Y, Z) {
   translate([X,Y,Z])
     rotate([0,90,270])
@@ -207,7 +218,7 @@ module CncZ(Width, Length, Height, CarriageZ, GantryY) {
   Z=Height-25;
   AxisToPlateOffset=-10;
   AxisX=X-30;
-  AxisY=Y-20;
+  AxisY=Y-14.5;
   AxisZ=Z-60+AxisToPlateOffset;
   translate([AxisX,AxisY,AxisZ])
     SainSmart100(CarriageZAdjusted);
@@ -217,7 +228,7 @@ module CncZ(Width, Length, Height, CarriageZ, GantryY) {
   translate([SpindleX,SpindleY,SpindleZ])
     Spindle();
   PlateX=X;
-  PlateY=Y+12;
+  PlateY=Y+17;
   PlateZ=Z+25;
   CncZPlate(PlateX,PlateY,PlateZ);
 }
@@ -233,19 +244,6 @@ module CncX(Width, Length, Height, GantryY) {
   translate([0,GantryY+30,Height])
     rotate([0,90,0])
       Extrusion(20,40,Width);
-      /*
-  // x idler
-  translate([Width-40,Length/2,
-    Height+44])
-    rotate([0,0,270])
-      idler_pulley_plate();
-  // x motor
-  CncStepper(-20,Width/2-20,Height+40,0,0,0);
-  // x motor plate
-  translate([40,Width/2-40,Height+44])
-    rotate([0,0,90])
-      motor_mount_plate_nema17();
-      */
   // left corner brackets
   translate([20,GantryY+20,Height-20])
     rotate([-90,0,0])
